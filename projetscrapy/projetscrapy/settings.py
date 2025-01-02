@@ -17,7 +17,7 @@ NEWSPIDER_MODULE = "projetscrapy.spiders"
 #USER_AGENT = "projetscrapy (+http://www.yourdomain.com)"
 
 # Obey robots.txt rules
-ROBOTSTXT_OBEY = False
+ROBOTSTXT_OBEY = True
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
 #CONCURRENT_REQUESTS = 32
@@ -91,3 +91,21 @@ ROBOTSTXT_OBEY = False
 REQUEST_FINGERPRINTER_IMPLEMENTATION = "2.7"
 TWISTED_REACTOR = "twisted.internet.asyncioreactor.AsyncioSelectorReactor"
 FEED_EXPORT_ENCODING = "utf-8"
+
+# settings.py
+
+# Ajout des middlewares Splash
+DOWNLOADER_MIDDLEWARES = {
+    'scrapy_splash.SplashCookiesMiddleware': 723,
+    'scrapy_splash.SplashMiddleware': 725,
+    'scrapy.downloadermiddlewares.httpcompression.HttpCompressionMiddleware': 810,
+}
+
+# Activation du dédoublonnage Splash
+DUPEFILTER_CLASS = 'scrapy_splash.SplashAwareDupeFilter'
+
+# Utilisation d’un cache pour Splash
+HTTPCACHE_STORAGE = 'scrapy_splash.SplashAwareFSCacheStorage'
+
+# URL de l’instance Splash
+SPLASH_URL = 'http://localhost:8050'

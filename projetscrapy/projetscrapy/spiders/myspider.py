@@ -1,26 +1,38 @@
 import scrapy
-
+from scrapy_splash import SplashRequest
 
 class MyspiderSpider(scrapy.Spider):
     name = "myspider"
-    allowed_domains = ["www.darty.com"]
-    start_urls = ["https://www.darty.com/nav/achat/telephonie/telephone_mobile_seul/iphoneex/index.html#dartyclic=X_tele-obje-conn_ipho"]
-    # Ajouter un User-Agent personnalisé
-    custom_settings = {
-        'USER_AGENT': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-    }
-    def parse(self, response):
-        phones = response.xpath('//section[@class="product_list_content"]') 
-        for phone in phones:
-            desc = phone.xpath('./div[@class="prd-family"]/a/span/text()').get()
-            prix = phone.xpath('./div[@class="product-price__price price"]/text()').get()
+    allowed_domains = ["ldlc.com","localhost"]
+    start_urls = ["https://www.ldlc.com/telephonie/telephonie-portable/mobile-smartphone/c4416/"]
 
+# Utilise SplashRequest pour charger les pages avec JavaScript
+    def start_requests(self):
+        for url in self.start_urls:
+            yield SplashRequest(url, callback=self.parse, args={'wait': 5})
+
+    def parse(self, response):
+        phones = response.xpath('//li[@class="pdt-item"]') 
+
+        #pour debuger
+        print(f"Nombre de produits trouvés : {len(phones)}") 
+        for phone in phones:
+            nom = phone.xpath('./div[@class="dsp-cell-right"]/div[@class="pdt-info"]/div[@class="pdt-desc"]/h3[@class="title-3"]/a/text()').get()
+            prix = phone.xpath('./div[@class="dsp-cell-right"]/div[@class="basket"]/div/div[@class="price"]/text()').get()
+            lien = phone.xpath('./div[@class="dsp-cell-right"]/div[@class="pdt-info"]/div[@class="pdt-desc"]/h3[@class="title-3"]/a/@href').get()
+
+            #print(f"Produit trouvé - Nom: {nom}, Prix: {prix}")
             yield {
-                'Nom': desc,
-                'prix': prix
+                'Nom': nom,
+                'Prix': prix,
+                'Lien': lien
             }
 
-        #suivante = response.xpath('//li[@class="next"]/a/@href').get()
-        #if suivante is not None:
-            #lien = response.urljoin(suivante)
-            #yield scrapy.Request(lien)
+        #suivre les liens des pages suivantes
+        next_page = response.xpath('//li[@class="next"]/a/@href').get() 
+        if next_page:
+            next_page_url = response.urljoin(next_page)
+            yield SplashRequest(next_page_url, callback=self.parse, args={'wait': 5})
+
+
+
