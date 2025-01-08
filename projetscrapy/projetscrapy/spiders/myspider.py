@@ -1,5 +1,6 @@
 import scrapy
 from scrapy_splash import SplashRequest
+from ..items import ProjetscrapyItem
 
 class MyspiderSpider(scrapy.Spider):
     name = "myspider"
@@ -17,16 +18,12 @@ class MyspiderSpider(scrapy.Spider):
         #pour debuger
         print(f"Nombre de produits trouvés : {len(phones)}") 
         for phone in phones:
-            nom = phone.xpath('./div[@class="dsp-cell-right"]/div[@class="pdt-info"]/div[@class="pdt-desc"]/h3[@class="title-3"]/a/text()').get()
-            prix = phone.xpath('./div[@class="dsp-cell-right"]/div[@class="basket"]/div/div[@class="price"]/text()').get()
-            lien = phone.xpath('./div[@class="dsp-cell-right"]/div[@class="pdt-info"]/div[@class="pdt-desc"]/h3[@class="title-3"]/a/@href').get()
+            telephone= ProjetscrapyItem()
+            telephone["nom"] = phone.xpath('./div[@class="dsp-cell-right"]/div[@class="pdt-info"]/div[@class="pdt-desc"]/h3[@class="title-3"]/a/text()').get()
+            telephone["prix"] = phone.xpath('./div[@class="dsp-cell-right"]/div[@class="basket"]/div/div[@class="price"]/text()').get()
+            telephone["lien"] = response.urljoin(phone.xpath('./div[@class="dsp-cell-right"]/div[@class="pdt-info"]/div[@class="pdt-desc"]/h3[@class="title-3"]/a/@href').get())
 
-            #print(f"Produit trouvé - Nom: {nom}, Prix: {prix}")
-            yield {
-                'Nom': nom,
-                'Prix': prix,
-                'Lien': lien
-            }
+            yield telephone
 
         #suivre les liens des pages suivantes
         next_page = response.xpath('//li[@class="next"]/a/@href').get() 

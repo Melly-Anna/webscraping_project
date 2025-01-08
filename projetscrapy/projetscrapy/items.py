@@ -8,5 +8,7 @@ import scrapy
 
 class ProjetscrapyItem(scrapy.Item):
     # define the fields for your item here like:
-    # name = scrapy.Field()
-    pass
+    nom = scrapy.Field()
+    prix = scrapy.Field()
+    lien = scrapy.Field()
+    
