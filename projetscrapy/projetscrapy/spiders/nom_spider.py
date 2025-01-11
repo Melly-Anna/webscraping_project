@@ -12,10 +12,10 @@ class NomSpiderSpider(scrapy.Spider):
             yield{
                 "nom": phone.xpath('.//div[@class="product-name"]/h5/a/text()').get(),
                 "price": phone.xpath('.//div[@class="price"]/div/text()').get(),
-                "lien": phone.xpath('.//div[@class="product-name"]/h5/a/@href').get(),
-            }
+                "lien": response.urljoin(phone.xpath('.//div[@class="product-name"]/h5/a/@href').get()),
+            }gi
 
-        next_page = response.xpath('//nav[@class="pager"]/div/div/a[2]/@href').get()
+        next_page = response.xpath('//nav[@class="pager"]/div/div/a[contains(text(), "SUIVANT")]/@href').get()
         if next_page is not None:
             next_page_url = response.urljoin(next_page)
             yield scrapy.Request(next_page_url)
