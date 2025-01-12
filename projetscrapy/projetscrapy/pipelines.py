@@ -16,7 +16,7 @@ class MysqlPipeline:
         Initialise la connexion à la base de données.
         """
         self.connection = mysql.connector.connect(
-            host="localhost",  # Nom du service MySQL dans docker-compose.yml
+            host="localhost",  
             user="root",
             password="root",
             database="phonedb",
