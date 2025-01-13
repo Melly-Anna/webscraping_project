@@ -1,0 +1,20 @@
+.cheapest {
+    background-color: #d4edda; /* Vert clair */
+    font-weight: bold;
+    color: #155724;
+}
+
+h3 {
+    margin-top: 20px;
+    border-bottom: 2px solid #007bff;
+    padding-bottom: 5px;
+}
+
+body {
+    background-color: #f8f9fa;
+    font-family: Arial, sans-serif;
+}
+
+table {
+    margin-bottom: 20px;
+}

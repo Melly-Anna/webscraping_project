@@ -1,5 +1,5 @@
 import scrapy
-#from ..items import ProjetscrapyItem
+from ..items import ProjetscrapyItem
 
 class NomSpiderSpider(scrapy.Spider):
     name = 'nom_spider'
@@ -9,11 +9,12 @@ class NomSpiderSpider(scrapy.Spider):
     def parse(self, response):
         phones = response.xpath('//div[@class="product-module"]')
         for phone in phones :
-            yield{
-                "nom": phone.xpath('.//div[@class="product-name"]/h5/a/text()').get(),
-                "price": phone.xpath('.//div[@class="price"]/div/text()').get(),
-                "lien": response.urljoin(phone.xpath('.//div[@class="product-name"]/h5/a/@href').get()),
-            }gi
+            telephone= ProjetscrapyItem()
+            telephone["nom"]=phone.xpath('.//div[@class="product-name"]/h5/a/text()').get()
+            telephone["prix"] = phone.xpath('.//div[@class="price"]/div/text()').get()
+            telephone["lien"]=response.urljoin(phone.xpath('.//div[@class="product-name"]/h5/a/@href').get())
+
+            yield telephone
 
         next_page = response.xpath('//nav[@class="pager"]/div/div/a[contains(text(), "SUIVANT")]/@href').get()
         if next_page is not None:

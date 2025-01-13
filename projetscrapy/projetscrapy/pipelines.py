@@ -36,18 +36,33 @@ class MysqlPipeline:
         """
         Insère chaque item dans la base de données.
         """
-        # Prépare et exécute la requête SQL
-        self.cursor.execute("""
-            INSERT INTO phones_ldlc (nom, prix, lien)
-            VALUES (%s, %s, %s)
-        """, (
-            item.get('nom'),  # Champ Nom récupéré par le spider
-            item.get('prix'),  # Champ Prix récupéré par le spider
-            item.get('lien')  # Champ Lien récupéré par le spider
-        ))
+        # Si premier spider
+        if spider.name=='myspider':
+            self.cursor.execute("""
+                INSERT INTO phones_ldlc (nom, prix, lien)
+                VALUES (%s, %s, %s)
+            """, (
+                item.get('nom'),  # Champ Nom récupéré par le spider
+                item.get('prix'),  # Champ Prix récupéré par le spider
+                item.get('lien')  # Champ Lien récupéré par le spider
+            ))
 
-        # Sauvegarde les modifications dans la base
-        self.connection.commit()
+            # Sauvegarde les modifications dans la base
+            self.connection.commit()
+
+        # Si le spider est le deuxième
+        elif spider.name == 'nom_spider':
+            self.cursor.execute("""
+                INSERT INTO phones_mobileshop (nom, prix, lien)
+                VALUES (%s, %s, %s)
+            """, (
+                item.get('nom'),  # Champ Nom récupéré par le spider
+                item.get('prix'),  # Champ Prix récupéré par le spider
+                item.get('lien')  # Champ Lien récupéré par le spider
+            ))
+
+            # Sauvegarde les modifications dans la base
+            self.connection.commit()
 
         # Retourne l'item pour continuer le pipeline
         return item
