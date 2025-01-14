@@ -5,7 +5,7 @@ FROM python:3.10-slim
 WORKDIR /app
 
 # Copier les fichiers nécessaires
-COPY ./interface_web /app
+COPY . /app
 
 # Installer les dépendances Python
 RUN pip install --no-cache-dir -r requirements.txt

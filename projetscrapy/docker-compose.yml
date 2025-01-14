@@ -1,5 +1,4 @@
 version: '3.9'
-
 services:
   mysql:
     build:
@@ -27,4 +26,17 @@ services:
       PMA_PASSWORD: password
     ports:
       - "8080:80"
+  
+  flask-app:
+    build:
+      context: ./interface_web
+    container_name: flask-app
+    ports:
+      - "5001:5000"
+    depends_on:
+      - mysql
+    volumes:
+    - ./interface_web:/a
+
+  
 

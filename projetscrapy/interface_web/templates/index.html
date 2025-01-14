@@ -11,32 +11,28 @@
     <div class="container my-5">
         <h1 class="text-center mb-5">Comparateur de prix d'iPhones</h1>
         
-        {% for (categorie, stockage), produits in comparaisons.items() %}
+        {% for (categorie, stockage), produits in produits_par_categorie.items() %}
         <div class="mb-4">
             <h3 class="text-primary">{{ categorie }} - {{ stockage }}</h3>
             <table class="table table-striped table-bordered">
                 <thead class="table-dark">
                     <tr>
-                        <th>LDLC</th>
-                        <th>Prix </th>
-                        <th>Mobile Shop </th>
-                        <th>Prix </th>
+                        <th>Nom du produit</th>
+                        <th>Prix</th>
+                        <th>Site</th>
+                        <th>Lien</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for produit in produits %}
                     <tr>
-                        <td class="{% if produit.moins_cher == 'site_1' %}cheapest{% endif %}">
-                            <a href="{{ produit.produit_1_url }}" target="_blank">{{ produit.produit_1_nom }}</a>
+                        <td>{{ produit.nom }}</td>
+                        <td class="{% if produit.moins_cher %}cheapest{% endif %}">
+                            {{ produit.prix }} 
                         </td>
-                        <td class="{% if produit.moins_cher == 'site_1' %}cheapest{% endif %}">
-                            {{ produit.produit_1_prix }} €
-                        </td>
-                        <td class="{% if produit.moins_cher == 'site_2' %}cheapest{% endif %}">
-                            <a href="{{ produit.produit_2_url }}" target="_blank">{{ produit.produit_2_nom }}</a>
-                        </td>
-                        <td class="{% if produit.moins_cher == 'site_2' %}cheapest{% endif %}">
-                            {{ produit.produit_2_prix }} €
+                        <td>{{ produit.site }}</td>
+                        <td>
+                            <a href="{{ produit.lien }}" target="_blank">Voir le produit</a>
                         </td>
                     </tr>
                     {% endfor %}

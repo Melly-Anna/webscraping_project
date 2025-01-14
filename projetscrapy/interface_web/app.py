@@ -4,10 +4,9 @@ import mysql.connector
 
 app = Flask(__name__)
 
-# Connexion à la base MySQL (les paramètres viennent de docker-compose)
 def get_db_connection():
     return mysql.connector.connect(
-        host="mysql",  # Nom du service MySQL dans docker-compose.yml
+        host="mysql", 
         user=os.environ.get("DB_USER", "myuser"),
         password=os.environ.get("DB_PASSWORD", "password"),
         database=os.environ.get("DB_NAME", "phonedb")
@@ -15,40 +14,49 @@ def get_db_connection():
 
 @app.route('/')
 def comparateur():
-    # Connexion à la base
+    
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
 
-    # Récupérer les produits des deux tables
-    cursor.execute("SELECT nom, prix,lien, categorie, stockage FROM phones_ldlc WHERE categorie!= 'Autre' ")
+    cursor.execute("SELECT nom, prix, lien, categorie, stockage FROM phones_ldlc WHERE categorie != 'Autre'")
     produits_site_1 = cursor.fetchall()
     
-    cursor.execute("SELECT nom, prix,lien, categorie, stockage FROM phones_mobileshop")
+    cursor.execute("SELECT nom, prix, lien, categorie, stockage FROM phones_mobileshop")
     produits_site_2 = cursor.fetchall()
     
     conn.close()
 
-    # Comparer les prix entre les deux tables
-    comparaisons = {}
-    for produit_1 in produits_site_1:
-        for produit_2 in produits_site_2:
-            if produit_1['categorie'] == produit_2['categorie'] and produit_1['stockage'] == produit_2['stockage']:
-                key = (produit_1['categorie'], produit_1['stockage'])
-                if key not in comparaisons:
-                    comparaisons[key] = []
-                comparaisons[key].append({
-                    'produit_1_nom': produit_1['nom'],
-                    'produit_1_prix': produit_1['prix'],
-                    'produit_1_url': produit_1['lien'],
-                    'produit_2_nom': produit_2['nom'],
-                    'produit_2_prix': produit_2['prix'],
-                    'produit_2_url': produit_2['lien'],
-                    'moins_cher': 'site_1' if produit_1['prix'] < produit_2['prix'] else 'site_2'
-                })
+    
+    produits_par_categorie = {}
+    
+  
+    for produit in produits_site_1:
+        key = (produit['categorie'], produit['stockage'])
+        if key not in produits_par_categorie:
+            produits_par_categorie[key] = []
+        produit['site'] = 'LDLC' 
+        produits_par_categorie[key].append(produit)
+    
+    for produit in produits_site_2:
+        key = (produit['categorie'], produit['stockage'])
+        if key not in produits_par_categorie:
+            produits_par_categorie[key] = []
+        produit['site'] = 'Mobile Shop' 
+        produits_par_categorie[key].append(produit)
+    
+    
+    for key, produits in produits_par_categorie.items():
+        # Trier produits par prix 
+        produits.sort(key=lambda x: x['prix'])
+        
+        # prix min
+        min_price = produits[0]['prix']  
 
-    # Passer les données au template
-    return render_template('index.html', comparaisons=comparaisons)
+        # Marquer les produits avec le prix minimum
+        for produit in produits:
+            produit['moins_cher'] = produit['prix'] == min_price
+
+    return render_template('index.html', produits_par_categorie=produits_par_categorie)
 
 if __name__ == '__main__':
-    app.run(debug=True)
-
+    app.run(host="0.0.0.0", port=5000)
